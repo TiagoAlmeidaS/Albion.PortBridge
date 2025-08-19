@@ -1,0 +1,20 @@
+# Configuração do ngrok para Albion.PortBridge
+authtoken: ${NGROK_AUTHTOKEN}
+
+# Configurações globais
+log: stdout
+log_level: info
+
+# Túnel TCP para o Albion.PortBridge
+tunnels:
+  albion-sniffer:
+    proto: tcp
+    addr: proxy:${PUBLIC_EXPOSE_PORT}
+    inspect: true
+    
+  # Túnel alternativo para HTTP (opcional)
+  albion-http:
+    proto: http
+    addr: proxy:${PUBLIC_EXPOSE_PORT}
+    inspect: true
+    bind_tls: false

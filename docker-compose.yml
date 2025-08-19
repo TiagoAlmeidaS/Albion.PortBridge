@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  proxy:
+    build: ./Albion.Proxy
+    environment:
+      - LOCAL_FORWARD_PORT=${LOCAL_FORWARD_PORT}
+      - PUBLIC_EXPOSE_PORT=${PUBLIC_EXPOSE_PORT}
+    ports:
+      - "${PUBLIC_EXPOSE_PORT}:${PUBLIC_EXPOSE_PORT}"
+    networks:
+      - albionnet
+    restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    volumes:
+      - ./ngrok/ngrok.yml:/etc/ngrok.yml
+    command: start --config /etc/ngrok.yml --all
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    networks:
+      - albionnet
+    restart: unless-stopped
+    depends_on:
+      - proxy
+
+networks:
+  albionnet:
+    driver: bridge
