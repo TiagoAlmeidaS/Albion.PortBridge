@@ -26,6 +26,12 @@ help:
 	@echo "🧪 Desenvolvimento:"
 	@echo "  dev       - Modo desenvolvimento local"
 	@echo "  test      - Executa testes"
+	@echo "  test-udp  - Testa conectividade UDP"
+	@echo ""
+	@echo "🌐 FRP UDP (Infra Local):"
+	@echo "  frp-setup - Configura FRP para UDP"
+	@echo "  frp-test  - Testa túnel FRP UDP"
+	@echo "  status    - Verifica status do sistema"
 	@echo ""
 	@echo "📋 Utilitários:"
 	@echo "  setup     - Configuração inicial"
@@ -110,6 +116,22 @@ dev:
 	@echo "  Local: 127.0.0.1:5151"
 	@echo "  Servidor: 127.0.0.1:5050"
 
+# Modo .NET + ngrok (sem Docker)
+dotnet:
+	@echo "🚀 Modo .NET + ngrok (sem Docker)..."
+	@echo "📋 Execute um dos scripts:"
+	@echo ""
+	@echo "Windows (PowerShell):"
+	@echo "  .\\scripts\\start-dotnet.ps1"
+	@echo ""
+	@echo "Linux/Mac:"
+	@echo "  chmod +x scripts/start-dotnet.sh"
+	@echo "  ./scripts/start-dotnet.sh"
+	@echo ""
+	@echo "Ou manualmente:"
+	@echo "  Terminal 1: cd Albion.Proxy && dotnet run"
+	@echo "  Terminal 2: ngrok tcp 5151"
+
 # Executa testes
 test:
 	@echo "🧪 Executando testes..."
@@ -131,6 +153,54 @@ update:
 	@echo "🔄 Atualizando dependências..."
 	docker-compose -f $(COMPOSE_FILE) pull
 	@echo "✅ Dependências atualizadas!"
+
+# Configuração FRP UDP
+frp-setup:
+	@echo "🌐 Configurando FRP para UDP..."
+	@echo "📋 Execute os seguintes passos:"
+	@echo ""
+	@echo "1️⃣  No SEGUNDO PC (servidor intermediário):"
+	@echo "   cd frps"
+	@echo "   install-frp.bat"
+	@echo "   run-frps.bat"
+	@echo ""
+	@echo "2️⃣  Na MÁQUINA PRINCIPAL (com Crypto):"
+	@echo "   cd frpc"
+	@echo "   install-frp.bat"
+	@echo "   # Edite frpc.ini com o IP do segundo PC"
+	@echo "   run-frpc.bat"
+	@echo ""
+	@echo "3️⃣  Configure firewall:"
+	@echo "   firewall-rules.bat"
+	@echo ""
+	@echo "✅ Configuração FRP concluída!"
+
+# Teste do túnel FRP UDP
+frp-test:
+	@echo "🧪 Testando túnel FRP UDP..."
+	@if command -v python3 >/dev/null 2>&1; then \
+		echo "🐍 Testando com Python..."; \
+		cd test && python3 test-udp.py; \
+	elif command -v python >/dev/null 2>&1; then \
+		echo "🐍 Testando com Python..."; \
+		cd test && python test-udp.py; \
+	else \
+		echo "⚠️  Python não encontrado. Use o script PowerShell:"; \
+		echo "   cd test && .\\test-udp.ps1"; \
+	fi
+
+# Teste de conectividade UDP
+test-udp: frp-test
+
+# Verifica status do sistema
+status:
+	@echo "🔍 Verificando status do sistema..."
+	@if command -v cmd >/dev/null 2>&1; then \
+		./check-status.bat; \
+	else \
+		echo "⚠️  Script de status disponível apenas no Windows"; \
+		echo "   Execute: ./check-status.bat"; \
+	fi
 
 # Comando padrão
 .DEFAULT_GOAL := help
