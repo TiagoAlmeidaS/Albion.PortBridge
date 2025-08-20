@@ -159,6 +159,73 @@ echo "ping" | nc -u 192.168.18.31 15151
 - ✅ Verifique regras do Windows Defender
 - ✅ Confirme portas 6000/UDP e 15151/UDP
 
+### 🔴 **PROBLEMA CRÍTICO: Porta 5050 Ocupada**
+
+**Sintoma:** O Albion.PortBridge não consegue iniciar na porta 5050, mostrando erro de "porta já em uso".
+
+**Causa:** A porta 5050 está sendo ocupada por outro processo do Windows (geralmente `svchost.exe` com serviço `CDPSvc`).
+
+**Solução Obrigatória:**
+
+#### **Passo 1: Identificar o Processo Ocupante**
+```powershell
+# Verificar qual processo está usando a porta 5050
+netstat -ano | findstr :5050
+
+# Exemplo de saída:
+# UDP    0.0.0.0:5050           *:*                                    10432
+```
+
+#### **Passo 2: Identificar o Serviço Específico**
+```powershell
+# Verificar qual serviço está rodando no PID identificado
+tasklist /SVC /FI "PID eq 10432"
+
+# Exemplo de saída:
+# Nome da imagem    Identifi Serviços
+# ========================= ======== ============================================
+# svchost.exe          10432 CDPSvc
+```
+
+#### **Passo 3: Finalizar o Serviço Ocupante**
+```powershell
+# Opção 1: Parar o serviço (recomendado)
+sc stop CDPSvc
+
+# Opção 2: Desabilitar o serviço permanentemente
+sc config CDPSvc start= disabled
+
+# Opção 3: Forçar finalização do processo (último recurso)
+taskkill /PID 10432 /F
+```
+
+#### **Passo 4: Verificar Liberação da Porta**
+```powershell
+# Confirmar que a porta foi liberada
+netstat -ano | findstr :5050
+
+# Se não retornar nada, a porta foi liberada com sucesso
+```
+
+#### **Scripts Automatizados**
+Execute um dos scripts criados especificamente para este problema:
+
+```bash
+# Script Batch (execute como administrador)
+stop-cdp-service.bat
+
+# Script PowerShell (execute como administrador)
+stop-cdp-service.ps1
+
+# Script para forçar liberação da porta
+force-release-port-5050.bat
+```
+
+#### **⚠️ IMPORTANTE:**
+- **Execute sempre como administrador** para ter permissões suficientes
+- O serviço `CDPSvc` pode reiniciar automaticamente - use `sc config CDPSvc start= disabled` para desabilitar permanentemente
+- Se o problema persistir, pode ser necessário reiniciar o computador
+
 ### Logs e Debug
 
 #### Servidor FRP
@@ -230,9 +297,10 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 Se encontrar problemas:
 
 1. Verifique a seção de troubleshooting
-2. Consulte os logs do FRP
-3. Abra uma issue no GitHub
-4. Inclua logs e configurações relevantes
+2. **Para porta 5050 ocupada, use a solução obrigatória acima**
+3. Consulte os logs do FRP
+4. Abra uma issue no GitHub
+5. Inclua logs e configurações relevantes
 
 ---
 
