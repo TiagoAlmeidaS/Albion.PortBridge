@@ -31,6 +31,7 @@ help:
 	@echo "🌐 FRP UDP (Infra Local):"
 	@echo "  frp-setup - Configura FRP para UDP"
 	@echo "  frp-test  - Testa túnel FRP UDP"
+	@echo "  frp-receiver - Configura SUA máquina como receptora"
 	@echo "  status    - Verifica status do sistema"
 	@echo ""
 	@echo "📋 Utilitários:"
@@ -194,6 +195,21 @@ test-udp: frp-test
 
 # Verifica status do sistema
 status:
+
+# Configuração para SUA máquina como receptora
+frp-receiver:
+	@echo "🌐 Configurando SUA máquina como receptora de dados..."
+	@echo "📋 Execute o seguinte comando:"
+	@echo ""
+	@echo "setup-receiver.bat"
+	@echo ""
+	@echo "Isso irá:"
+	@echo "1. Detectar o IP da sua máquina"
+	@echo "2. Configurar o servidor FRP (frps)"
+	@echo "3. Configurar regras de firewall"
+	@echo "4. Fornecer instruções para o PC do Crypto"
+	@echo ""
+	@echo "✅ Após a configuração, sua máquina receberá dados UDP na porta 15151"
 	@echo "🔍 Verificando status do sistema..."
 	@if command -v cmd >/dev/null 2>&1; then \
 		./check-status.bat; \
